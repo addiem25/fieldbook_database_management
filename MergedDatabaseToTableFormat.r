@@ -15,6 +15,9 @@ for (filex in filenames){
   # Only keep unique plot_ids
   dataUnique<-data.frame(unique(data[,1]))
   colnames(dataUnique)<-"rid"
+  
+  # Set up data.frame for conflicts
+  conflictsout<-data.frame(rid=integer(),parent=factor(),userValue=numeric())
 
   # Split based on trait (splits to list)
   dataSplit<-split(data,data$parent)
@@ -28,6 +31,8 @@ for (filex in filenames){
       next
     }
     traitName<-temp$parent[1]
+    conflicts<-temp[duplicated(temp$rid),]
+    conflictsout<-rbind(conflictsout,conflicts)
     temp<-temp[,-2]
     temp<-aggregate(as.numeric(temp[,2],stringsAsFactors=F),
                     by=list(temp[,1]),mean)
@@ -37,5 +42,6 @@ for (filex in filenames){
 
   # Write data
   write.csv(dataUnique,file=paste("./tableFormat/",filex,"_tableFormat.csv",sep=""),row.names=FALSE)
-
+  # Write conflicts
+  write.csv(conflictsout,file=paste("./tableFormat/",filex,"_conflicts.csv",sep=""))
 }
