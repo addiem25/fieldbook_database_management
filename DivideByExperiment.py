@@ -68,7 +68,7 @@ for g in guide:
                 print("Adding " + row[0])
     #Check to see of traitscontain is NA, if so converting and writing is not necessary
     if (g[3] == 'NA'):
-        with open(str(g[0]) + ".csv", 'w', newline='') as csvFile:
+        with open(str(g[0]) + ".csv", 'w') as csvFile:
             w = csv.writer(csvFile, dialect='excel')
             w.writerow(["rid", "parent", "userValue", "timeTaken"])
             w.writerows(plots)
@@ -113,7 +113,7 @@ for g in guide:
                 if (nu in row[1]):
                     data.append(row)
         #Write the data to a CSV file with the name of the experiment name.
-        with open(str(g[0]) + ".csv", 'w', newline='') as csvFile:
+        with open(str(g[0]) + ".csv", 'w') as csvFile:
             w = csv.writer(csvFile, dialect='excel')
             w.writerow(["rid", "parent", "userValue", "timeTaken"])
             w.writerows(data)
