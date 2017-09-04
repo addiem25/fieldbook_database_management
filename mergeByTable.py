@@ -34,29 +34,49 @@ Luke Steffen
 
 '''
 
+import argparse
+import sys
+import os
 import sqlite3 as sql
 
-con = sql.connect("databases2017-3/test.db")
-con2 = sql.connect("databases2017-3/Green2.db")
 
+#Example usage
+#python mergeByTable.py ./experiment_data/2015/databases ./projects/staygreen/final_databaset.db
+
+parser = argparse.ArgumentParser("Grab data from multiple SQL lite databases and merge into a single output database")
+parser.add_argument("directory",metavar="Path/To/Database/Directory",help="Path to a directory containing the SQLlite databases to merge.")
+parser.add_argument("finaldatabase",metavar="Path/To/Final/Database.db",help="Final database to dump the merged results into")
+
+args = parser.parse_args()
+
+print args.directory
+
+if not os.path.exists(args.directory):
+	print "{0} does not appear to be a valid path. Dying.".format(args.directory)
+
+
+con = sql.connect(args.finaldatabase)
 c = con.cursor()
-c2 = con2.cursor()
+c.execute("CREATE TABLE IF NOT EXISTS user_traits(rid, parent, traits, userValue, timeTaken)")
+
+mydbs = os.listdir(args.directory)
 
 
-c2.execute("SELECT rid, parent, trait, userValue, timeTaken FROM user_traits")
-output = c2.fetchall()
 
-#Comment out the line below if you are using a database that already exists
-# c.execute("CREATE TABLE user_traits(rid, parent, traits, userValue, timeTaken)")
-c.execute("BEGIN")
-for row in output:
-    c.execute("INSERT INTO user_traits VALUES (?, ?, ?, ?, ?)", row)
-con.commit()
-print("Data has been written")
+for abd in mydbs:
+	if abd[-3:] != ".db": continue
+	con2 = sql.connect("{0}/{1}".format(args.directory,abd))
+	c2 = con2.cursor()
+	c2.execute("SELECT rid, parent, trait, userValue, timeTaken FROM user_traits")
+	output = c2.fetchall()
+	c.execute("BEGIN")
+	for row in output:
+		c.execute("INSERT INTO user_traits VALUES (?, ?, ?, ?, ?)", row)
+	con.commit()
+	print("Wrote data from {0} to database {1}".format(abd,args.finaldatabase))
 
 c.execute("SELECT * FROM user_traits ORDER BY rid")
 con.commit()
-
 print("Database has been sorted by rid.")
 
 
