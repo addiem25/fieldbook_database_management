@@ -64,8 +64,6 @@ for g in guide:
     for row in output:
         if(g[1] <= int(row[0]) <= g[2]):
             plots.append(row)
-            if (int(row[0]) == 6401):
-                print("Adding " + row[0])
     #Check to see of traitscontain is NA, if so converting and writing is not necessary
     if (g[3] == 'NA'):
         with open(str(g[0]) + ".csv", 'w') as csvFile:
